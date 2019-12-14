@@ -1,6 +1,6 @@
 import React, { FC } from 'react'
 import styled from 'styled-components'
-import SVG from 'react-inlinesvg'
+import SVG from './Icon'
 import linkSvg from '../svg/link.svg'
 import shipSvg from '../svg/ship.svg'
 import planeSvg from '../svg/plane.svg'
