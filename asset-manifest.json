@@ -1,0 +1,30 @@
+{
+  "files": {
+    "main.css": "/snatchmap/static/css/main.e5361b36.chunk.css",
+    "main.js": "/snatchmap/static/js/main.b51b76db.chunk.js",
+    "main.js.map": "/snatchmap/static/js/main.b51b76db.chunk.js.map",
+    "runtime-main.js": "/snatchmap/static/js/runtime-main.3a2abef2.js",
+    "runtime-main.js.map": "/snatchmap/static/js/runtime-main.3a2abef2.js.map",
+    "static/css/2.7efaf445.chunk.css": "/snatchmap/static/css/2.7efaf445.chunk.css",
+    "static/js/2.0a21db41.chunk.js": "/snatchmap/static/js/2.0a21db41.chunk.js",
+    "static/js/2.0a21db41.chunk.js.map": "/snatchmap/static/js/2.0a21db41.chunk.js.map",
+    "index.html": "/snatchmap/index.html",
+    "precache-manifest.64d8a8d22e3c0076668f818df719fdd1.js": "/snatchmap/precache-manifest.64d8a8d22e3c0076668f818df719fdd1.js",
+    "service-worker.js": "/snatchmap/service-worker.js",
+    "static/css/2.7efaf445.chunk.css.map": "/snatchmap/static/css/2.7efaf445.chunk.css.map",
+    "static/css/main.e5361b36.chunk.css.map": "/snatchmap/static/css/main.e5361b36.chunk.css.map",
+    "static/js/2.0a21db41.chunk.js.LICENSE": "/snatchmap/static/js/2.0a21db41.chunk.js.LICENSE",
+    "static/media/building.svg": "/snatchmap/static/media/building.97dede31.svg",
+    "static/media/link.svg": "/snatchmap/static/media/link.15cce0de.svg",
+    "static/media/logo.svg": "/snatchmap/static/media/logo.e1a80e4e.svg",
+    "static/media/plane.svg": "/snatchmap/static/media/plane.e375abac.svg",
+    "static/media/ship.svg": "/snatchmap/static/media/ship.3ca06a9c.svg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.3a2abef2.js",
+    "static/css/2.7efaf445.chunk.css",
+    "static/js/2.0a21db41.chunk.js",
+    "static/css/main.e5361b36.chunk.css",
+    "static/js/main.b51b76db.chunk.js"
+  ]
+}
