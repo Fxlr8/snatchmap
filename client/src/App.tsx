@@ -1,9 +1,15 @@
 import React from 'react';
-import Map from './components/Map'
+import Map from 'components/Map'
+import Logo from 'components/Logo'
+import Search from 'components/Search'
 
 const App: React.FC = () => {
   return (
-    <Map />
+    <>
+      <Map />
+      <Logo />
+      <Search />
+    </>
   );
 }
 
