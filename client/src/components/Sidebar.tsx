@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import React, { FC, useContext } from 'react'
 import styled from 'styled-components'
 import SVG from './Icon'
 import linkSvg from '../svg/link.svg'
@@ -8,6 +8,7 @@ import buildingSvg from '../svg/building.svg'
 import device from '../breakpoints'
 import useAxios from 'axios-hooks'
 import { Property, Person } from '../apiTypes'
+import { StateContext } from '../App'
 
 const SidebarContainer = styled.div<SidebarContainerProps>`
     width: 100vw;
@@ -328,8 +329,9 @@ const PersonInfo: FC<PersonInfoProps> = ({ person }) => {
 }
 
 const OtherProperty: FC<PropertyInfoProps> = ({ property }) => {
+    const { dispatch } = useContext(StateContext)
     return (
-        <Block>
+        <Block onClick={() => dispatch({ type: 'SELECT_PROPERTY', propertyId: property._id, ownerId: property.personId })}>
             <OtherPropertyImage src={property.photoUrl} />
             <Flex>
                 <PropertyName>{property.name}</PropertyName>
@@ -381,7 +383,9 @@ const OtherProperties: FC<OtherPropertiesProps> = ({ properties, propertyId }) =
                     </PropertyType>}
                 </PropertyTypes>
             </Block>}
-            {properties.filter(p => p._id !== propertyId).map(otherProperty => <OtherProperty property={otherProperty} />)}
+            {properties.filter(p => p._id !== propertyId).map(otherProperty =>
+                <OtherProperty property={otherProperty} />
+            )}
         </>
     )
 }

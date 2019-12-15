@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react';
+import React, { useReducer, useContext, createContext } from 'react';
 import Map from './components/Map'
 import Sidebar from './components/Sidebar'
 import Logo from 'components/Logo'
@@ -37,20 +37,33 @@ function appReducer(state: AppState, action: AppActions): AppState {
   return state
 }
 
+const initialState = {
+  sidebar: true,
+  propertyId: '5df642455341ca2822139b31',
+  ownerId: '5df642455341ca2822139b33'
+}
+
+const StateContext = createContext<{ state: AppState, dispatch: React.Dispatch<AppActions> }>(
+  {
+    state: initialState,
+    dispatch: () => initialState
+  }
+)
+
 const App: React.FC = () => {
-  const [state, dispatch] = useReducer(appReducer, {
-    sidebar: true,
-    propertyId: '5df642455341ca2822139b31',
-    ownerId: '5df642455341ca2822139b33'
-  })
+  const [state, dispatch] = useReducer(appReducer, initialState)
 
   return (
-    <>
+    <StateContext.Provider value={{ state, dispatch }}>
       <Map />
       <Sidebar show={state.sidebar} propertyId={state.propertyId} ownerId={state.ownerId} />
       <Logo />
       {/* <Search /> */}
-    </>
+    </StateContext.Provider >
   );
 }
-export default App;
+
+export {
+  StateContext
+}
+export default App
