@@ -6,6 +6,7 @@ import useAxios from 'axios-hooks'
 // import plane from 'svg/plane.svg'
 // import ship from 'svg/ship.svg'
 import pin from 'svg/pin.svg'
+import { Property } from 'apiTypes'
 
 const MapComponent = ReactMapboxGl({
     accessToken: 'pk.eyJ1IjoiZnhscjgiLCJhIjoiY2s0NGpieWpkMGJ6eDNvbWdvcml1aG1pZSJ9.pAeNPdFX91L9Z33XLXrnbA',
@@ -37,12 +38,10 @@ const Map: FC<MapProps> = ({ className }) => {
             <>
                 {!loading && !error ? (
                     <Layer type="symbol" id="marker" layout={layoutLayer} images={images}>
-                        {data.items.map((item: any) => {
-                            const [ lat, lng ] =item.location.geometry.coordinates
+                        {data.items.map((item: Property) => {
+                            const [lat, lng] = item.location.geometry.coordinates
                             const coordinates = [lat, lng]
-                            return (
-                                <Feature key={item._id} coordinates={coordinates} />
-                            )
+                            return <Feature key={item._id} coordinates={coordinates} />
                         })}
                     </Layer>
                 ) : null}
