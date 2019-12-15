@@ -5,16 +5,28 @@ import linkSvg from '../svg/link.svg'
 import shipSvg from '../svg/ship.svg'
 import planeSvg from '../svg/plane.svg'
 import buildingSvg from '../svg/building.svg'
+import device from '../breakpoints'
 
-const SidebarContainer = styled.div`
-    width: 420px;
-    height: 100vh;
+const SidebarContainer = styled.div<SidebarProps>`
+    width: 100vw;
+    height: 70vh;
+    top: 30vh;
     background-color: #FFF;
     position: fixed;
-    top: 0;
     left: 0;
     z-index: 10;
     overflow-y: scroll;
+
+    transform: translateX(${props => props.show ? 0 : -100}%);
+    transition: transform 200ms ease;
+
+    @media ${device.laptop} {
+        width: 420px;
+        height: 100vh;
+        top: 0;
+        transform: translateX(${props => props.show ? 0 : -100}%);
+        transform: translateY(${props => props.show ? 0 : 100}%);
+    }
 `
 
 const SidebarTitle = styled.div`
@@ -216,9 +228,13 @@ const OtherPropertyPrice = styled.div`
     color: #646464;
 `
 
-const Sidebar: FC = () => {
+interface SidebarProps {
+    show: boolean
+}
+
+const Sidebar: FC<SidebarProps> = ({ show }) => {
     return (
-        <SidebarContainer>
+        <SidebarContainer show={show}>
             <SearchBar />
             <Block>
                 <SidebarTitle>
