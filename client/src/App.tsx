@@ -40,7 +40,7 @@ const App: React.FC = () => {
   return (
     <>
       <Map />
-      <Sidebar show={state.sidebar} />
+      <Sidebar show={state.sidebar} propertyId={state.propertyId} />
       <Logo />
       {/* <Search /> */}
     </>

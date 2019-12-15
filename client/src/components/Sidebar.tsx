@@ -6,8 +6,10 @@ import shipSvg from '../svg/ship.svg'
 import planeSvg from '../svg/plane.svg'
 import buildingSvg from '../svg/building.svg'
 import device from '../breakpoints'
+import useAxios from 'axios-hooks'
+import { Property } from '../apiTypes'
 
-const SidebarContainer = styled.div<SidebarProps>`
+const SidebarContainer = styled.div<SidebarContainerProps>`
     width: 100vw;
     height: 70vh;
     top: 30vh;
@@ -230,9 +232,26 @@ const OtherPropertyPrice = styled.div`
 
 interface SidebarProps {
     show: boolean
+    propertyId?: string
 }
 
-const Sidebar: FC<SidebarProps> = ({ show }) => {
+interface SidebarContainerProps {
+    show: boolean
+}
+
+interface ApiResponse {
+    count: number
+    items: Property[]
+}
+
+const Sidebar: FC<SidebarProps> = ({ show, propertyId }) => {
+    const [{ data, loading, error }] = useAxios<Property>(
+        `https://branched-glue.glitch.me/object/objects/${propertyId}`
+    )
+
+    const property = data || {}
+    console.log(property)
+
     return (
         <SidebarContainer show={show}>
             <SearchBar />
@@ -241,21 +260,21 @@ const Sidebar: FC<SidebarProps> = ({ show }) => {
                     Объект
                 </SidebarTitle>
             </Block>
-            <PropertyImage src='https://avatars.mds.yandex.net/get-zen_doc/1641493/pub_5d5526c932335400ad075f91_5d55280ef2df2500ad7b61f1/scale_1200' />
+            <PropertyImage src={property.} />
             <Block>
                 <Flex>
-                    <PropertyName>Дом в Псехако</PropertyName>
+                    <PropertyName>{property.name}</PropertyName>
                     <PropertyFeature>2112м<sup>2</sup></PropertyFeature>
                 </Flex>
                 <PropertyDescription>Усачёва ул., 1А, стр. 2</PropertyDescription>
             </Block>
             <Block>
                 <Flex>
-                    <PriceTag>240 000 000 руб.</PriceTag>
+                    <PriceTag>{property.price}</PriceTag>
                 </Flex>
             </Block>
             <Block>
-                <Link href='google.com'>
+                <Link href={property.link}>
                     <LogoFBK />
                     <LinkTitle>Ссылка на расследование ФБК</LinkTitle>
                     <GreyIcon src={linkSvg} />
