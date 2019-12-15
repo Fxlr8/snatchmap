@@ -40,8 +40,8 @@ function appReducer(state: AppState, action: AppActions): AppState {
 const App: React.FC = () => {
   const [state, dispatch] = useReducer(appReducer, {
     sidebar: true,
-    propertyId: '5df60885ad40cc14a218290d',
-    ownerId: '5df60885ad40cc14a218290f'
+    propertyId: '5df642455341ca2822139b31',
+    ownerId: '5df642455341ca2822139b33'
   })
 
   return (

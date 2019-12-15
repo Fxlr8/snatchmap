@@ -11,6 +11,7 @@ export interface Property {
     text: string
     fbkUrl: string
     personId: string
+    photoUrl: string
     type: 'building' | 'yacht' | 'plane'
 }
 

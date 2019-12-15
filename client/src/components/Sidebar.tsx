@@ -257,7 +257,7 @@ const PropertyInfo: FC<PropertyInfoProps> = ({ property }) => {
                     Объект
                 </SidebarTitle>
             </Block>
-            <PropertyImage src='https://avatars.mds.yandex.net/get-zen_doc/1641493/pub_5d5526c932335400ad075f91_5d55280ef2df2500ad7b61f1/scale_1200' />
+            <PropertyImage src={property.photoUrl} />
             <Block>
                 <Flex>
                     <PropertyName>{property.name}</PropertyName>
@@ -330,13 +330,59 @@ const PersonInfo: FC<PersonInfoProps> = ({ person }) => {
 const OtherProperty: FC<PropertyInfoProps> = ({ property }) => {
     return (
         <Block>
-            <OtherPropertyImage src='https://placekitten.com/500/300' />
+            <OtherPropertyImage src={property.photoUrl} />
             <Flex>
                 <PropertyName>{property.name}</PropertyName>
                 <PropertyFeature>1920м<sup>2</sup></PropertyFeature>
             </Flex>
             <OtherPropertyPrice>{property.price} руб</OtherPropertyPrice>
         </Block>
+    )
+}
+
+interface OtherPropertiesProps {
+    properties: Property[]
+    propertyId?: string
+}
+
+const OtherProperties: FC<OtherPropertiesProps> = ({ properties, propertyId }) => {
+    const [houses, ships, planes] = properties.reduce(([s, h, p], { type }) => {
+        switch (type) {
+            case 'yacht': s += 1
+                break
+            case 'building': h += 1
+                break
+            case 'plane': p += 1
+                break
+        }
+        return [s, h, p]
+    }, [0, 0, 0])
+    return (
+        <>
+            {houses + ships + planes > 0 && <Block>
+                <PropertyTypes>
+                    {ships > 0 && <PropertyType>
+                        <GreyIcon src={shipSvg} />
+                        <PropertyTypeName>Яхты</PropertyTypeName>
+                        <PropertyDash />
+                        <PropertyCount>{ships}</PropertyCount>
+                    </PropertyType>}
+                    {planes > 0 && <PropertyType>
+                        <GreyIcon src={planeSvg} />
+                        <PropertyTypeName>Самолёты</PropertyTypeName>
+                        <PropertyDash />
+                        <PropertyCount>{planes}</PropertyCount>
+                    </PropertyType>}
+                    {houses > 0 && <PropertyType>
+                        <GreyIcon src={buildingSvg} />
+                        <PropertyTypeName>Недвижимость</PropertyTypeName>
+                        <PropertyDash />
+                        <PropertyCount>{houses}</PropertyCount>
+                    </PropertyType>}
+                </PropertyTypes>
+            </Block>}
+            {properties.filter(p => p._id !== propertyId).map(otherProperty => <OtherProperty property={otherProperty} />)}
+        </>
     )
 }
 
@@ -376,37 +422,7 @@ const Sidebar: FC<SidebarProps> = ({ show, propertyId, ownerId }) => {
                     <InfoData>2 980 200 000 руб</InfoData>
                 </InfoBlock>
             </Block>
-            <Block>
-                <PropertyTypes>
-                    <PropertyType>
-                        <GreyIcon src={shipSvg} />
-                        <PropertyTypeName>Яхты</PropertyTypeName>
-                        <PropertyDash />
-                        <PropertyCount>1</PropertyCount>
-                    </PropertyType>
-                    <PropertyType>
-                        <GreyIcon src={planeSvg} />
-                        <PropertyTypeName>Самолёты</PropertyTypeName>
-                        <PropertyDash />
-                        <PropertyCount>2</PropertyCount>
-                    </PropertyType>
-                    <PropertyType>
-                        <GreyIcon src={buildingSvg} />
-                        <PropertyTypeName>Недвижимость</PropertyTypeName>
-                        <PropertyDash />
-                        <PropertyCount>7</PropertyCount>
-                    </PropertyType>
-                </PropertyTypes>
-            </Block>
-            {propertiesData && propertiesData.count > 0 && propertiesData.items.filter(p => p._id !== propertyId).map(otherProperty => <OtherProperty property={otherProperty} />)}
-            <Block>
-                <OtherPropertyImage src='https://i.imgur.com/Wf8wsxR.png' />
-                <Flex>
-                    <PropertyName>Ещё один дом в Майнкрафте</PropertyName>
-                    <PropertyFeature>1298м<sup>2</sup></PropertyFeature>
-                </Flex>
-                <OtherPropertyPrice>57 руб</OtherPropertyPrice>
-            </Block>
+            {propertiesData && propertiesData.items && <OtherProperties properties={propertiesData.items} propertyId={propertyId} />}
         </SidebarContainer>
     )
 }
