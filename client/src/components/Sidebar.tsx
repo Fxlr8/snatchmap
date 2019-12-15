@@ -9,6 +9,7 @@ import device from '../breakpoints'
 import useAxios from 'axios-hooks'
 import { Property, Person } from '../apiTypes'
 import { StateContext } from '../App'
+import { FormattedNumber } from 'react-intl'
 
 const SidebarContainer = styled.div<SidebarContainerProps>`
     width: 100vw;
@@ -44,6 +45,10 @@ const SidebarTitle = styled.div`
 const Block = styled.div`
     padding: 0 24px;
     margin-bottom: 24px;
+`
+
+const ClickableBlock = styled(Block)`
+    cursor: pointer;
 `
 
 const Flex = styled.div`
@@ -266,13 +271,13 @@ const PropertyInfo: FC<PropertyInfoProps> = ({ property }) => {
                 </Flex>
                 <PropertyDescription>{property.text}</PropertyDescription>
             </Block>
-            <Block>
+            {property.price && <Block>
                 <Flex>
-                    <PriceTag>{property.price}</PriceTag>
+                    <PriceTag><FormattedNumber value={property.price} /> руб.</PriceTag>
                 </Flex>
-            </Block>
+            </Block>}
             <Block>
-                <Link href={property.fbkUrl}>
+                <Link target='_blank' href={property.fbkUrl}>
                     <LogoFBK />
                     <LinkTitle>Ссылка на расследование ФБК</LinkTitle>
                     <GreyIcon src={linkSvg} />
@@ -331,14 +336,14 @@ const PersonInfo: FC<PersonInfoProps> = ({ person }) => {
 const OtherProperty: FC<PropertyInfoProps> = ({ property }) => {
     const { dispatch } = useContext(StateContext)
     return (
-        <Block onClick={() => dispatch({ type: 'SELECT_PROPERTY', propertyId: property._id, ownerId: property.personId })}>
+        <ClickableBlock onClick={() => dispatch({ type: 'SELECT_PROPERTY', propertyId: property._id, ownerId: property.personId })}>
             <OtherPropertyImage src={property.photoUrl} />
             <Flex>
                 <PropertyName>{property.name}</PropertyName>
                 <PropertyFeature>1920м<sup>2</sup></PropertyFeature>
             </Flex>
             <OtherPropertyPrice>{property.price} руб</OtherPropertyPrice>
-        </Block>
+        </ClickableBlock>
     )
 }
 

@@ -4,12 +4,13 @@ import { Normalize } from 'styled-normalize'
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
+import { IntlProvider } from 'react-intl';
 
 ReactDOM.render(
-    <>
+    <IntlProvider locale='ru'>
         <Normalize />
         <App />
-    </>
+    </IntlProvider>
     ,
     document.getElementById('root')
 );

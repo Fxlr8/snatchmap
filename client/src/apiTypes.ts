@@ -2,7 +2,7 @@ export interface Property {
     _id: string
     link: string
     name: string
-    price: string
+    price: number
     personInfo: {
         name: string
     }
