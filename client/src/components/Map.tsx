@@ -24,7 +24,7 @@ const images: any = ['pin', image]
 
 const Map: FC<MapProps> = ({ className }) => {
     const [{ data, loading, error }] = useAxios(
-        'https://branched-glue.glitch.me/object/objects?fields=link,name,text,personInfo,locationUrl,location'
+        'https://branched-glue.glitch.me/object/objects?fields=link,name,text,personInfo,locationUrl,location,type'
     )
 
     console.log(data)

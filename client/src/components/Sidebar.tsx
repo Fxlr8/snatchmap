@@ -388,8 +388,8 @@ const OtherProperties: FC<OtherPropertiesProps> = ({ properties, propertyId }) =
                     </PropertyType>}
                 </PropertyTypes>
             </Block>}
-            {properties.filter(p => p._id !== propertyId).map(otherProperty =>
-                <OtherProperty property={otherProperty} />
+            {properties.filter(p => p._id !== propertyId).map((otherProperty, index) =>
+                <OtherProperty property={otherProperty} key={`otherProperty-${index}`} />
             )}
         </>
     )
