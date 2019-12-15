@@ -260,7 +260,7 @@ const Sidebar: FC<SidebarProps> = ({ show, propertyId }) => {
                     Объект
                 </SidebarTitle>
             </Block>
-            <PropertyImage src={property.} />
+            <PropertyImage src='https://avatars.mds.yandex.net/get-zen_doc/1641493/pub_5d5526c932335400ad075f91_5d55280ef2df2500ad7b61f1/scale_1200' />
             <Block>
                 <Flex>
                     <PropertyName>{property.name}</PropertyName>
