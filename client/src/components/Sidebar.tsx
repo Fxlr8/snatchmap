@@ -1,4 +1,4 @@
-import React, { FC, useContext } from 'react'
+import React, { FC, useContext, useRef, useEffect } from 'react'
 import styled from 'styled-components'
 import SVG from './Icon'
 import linkSvg from '../svg/link.svg'
@@ -9,7 +9,7 @@ import device from '../breakpoints'
 import useAxios from 'axios-hooks'
 import { Property, Person } from '../apiTypes'
 import { StateContext } from '../App'
-import { FormattedNumber } from 'react-intl'
+import { FormattedNumber, FormattedDate, FormattedRelativeTime } from 'react-intl'
 
 const SidebarContainer = styled.div<SidebarContainerProps>`
     width: 100vw;
@@ -236,16 +236,6 @@ const OtherPropertyPrice = styled.div`
     color: #646464;
 `
 
-interface SidebarProps {
-    show: boolean
-    propertyId?: string
-    ownerId?: string
-}
-
-interface SidebarContainerProps {
-    show: boolean
-}
-
 interface ApiPropertiesResponse {
     count: number
     items: Property[]
@@ -271,13 +261,13 @@ const PropertyInfo: FC<PropertyInfoProps> = ({ property }) => {
                 </Flex>
                 <PropertyDescription>{property.text}</PropertyDescription>
             </Block>
-            {property.price && <Block>
+            {!!property.price && <Block>
                 <Flex>
                     <PriceTag><FormattedNumber value={property.price} /> руб.</PriceTag>
                 </Flex>
             </Block>}
             <Block>
-                <Link target='_blank' href={property.fbkUrl}>
+                <Link target='_blank' href={property.proofUrl}>
                     <LogoFBK />
                     <LinkTitle>Ссылка на расследование ФБК</LinkTitle>
                     <GreyIcon src={linkSvg} />
@@ -301,7 +291,7 @@ const PersonInfo: FC<PersonInfoProps> = ({ person }) => {
             </Block>
             <Block>
                 <PersonBlock>
-                    <PersonImage style={{ backgroundImage: 'url(http://duma.gov.ru/media/persons/240x240_2x/bBET61AcAEG5c8Nk7jlFAW1XRFQCAc8l.jpg)' }} />
+                    <PersonImage style={{ backgroundImage: `url(${person.photoUrl})` }} />
                     <div>
                         <PersonSurname>{person.surname}</PersonSurname>
                         <PersonName>{person.name}</PersonName>
@@ -318,12 +308,12 @@ const PersonInfo: FC<PersonInfoProps> = ({ person }) => {
                 </InfoBlock>
                 <InfoBlock>
                     <InfoLabel>Стаж на посту</InfoLabel>
-                    <InfoData>3,5 года</InfoData>
+                    <InfoData><FormattedDate value={person.workFrom} /></InfoData>
                 </InfoBlock>
-                <InfoBlock>
+                {!!person.salary && <InfoBlock>
                     <InfoLabel>Официальный оклад</InfoLabel>
-                    <InfoData>{person.salary} руб.</InfoData>
-                </InfoBlock>
+                    <InfoData><FormattedNumber value={person.salary} /> руб.</InfoData>
+                </InfoBlock>}
                 <InfoBlock>
                     <InfoLabel>Время для накопления стоимости объекта</InfoLabel>
                     <InfoData>90 лет</InfoData>
@@ -342,7 +332,7 @@ const OtherProperty: FC<PropertyInfoProps> = ({ property }) => {
                 <PropertyName>{property.name}</PropertyName>
                 <PropertyFeature>1920м<sup>2</sup></PropertyFeature>
             </Flex>
-            <OtherPropertyPrice>{property.price} руб</OtherPropertyPrice>
+            <OtherPropertyPrice><FormattedNumber value={property.price} /> руб</OtherPropertyPrice>
         </ClickableBlock>
     )
 }
@@ -353,7 +343,9 @@ interface OtherPropertiesProps {
 }
 
 const OtherProperties: FC<OtherPropertiesProps> = ({ properties, propertyId }) => {
-    const [houses, ships, planes] = properties.reduce(([s, h, p], { type }) => {
+    let total = 0
+    const [houses, ships, planes] = properties.reduce(([s, h, p], { type, price }) => {
+        total += price
         switch (type) {
             case 'yacht': s += 1
                 break
@@ -364,9 +356,19 @@ const OtherProperties: FC<OtherPropertiesProps> = ({ properties, propertyId }) =
         }
         return [s, h, p]
     }, [0, 0, 0])
+
     return (
         <>
-            {houses + ships + planes > 0 && <Block>
+            <Block>
+                <SidebarTitle>Другое имущество чиновника</SidebarTitle>
+            </Block>
+            <Block>
+                <InfoBlock>
+                    <InfoLabel>Общая стоимость</InfoLabel>
+                    <InfoData><FormattedNumber value={total} /> руб</InfoData>
+                </InfoBlock>
+            </Block>
+            <Block>
                 <PropertyTypes>
                     {ships > 0 && <PropertyType>
                         <GreyIcon src={shipSvg} />
@@ -387,15 +389,57 @@ const OtherProperties: FC<OtherPropertiesProps> = ({ properties, propertyId }) =
                         <PropertyCount>{houses}</PropertyCount>
                     </PropertyType>}
                 </PropertyTypes>
-            </Block>}
-            {properties.filter(p => p._id !== propertyId).map((otherProperty, index) =>
-                <OtherProperty property={otherProperty} key={`otherProperty-${index}`} />
+            </Block>
+            {properties.filter(p => p._id !== propertyId).map(otherProperty =>
+                <OtherProperty key={otherProperty._id} property={otherProperty} />
             )}
         </>
     )
 }
 
+const Title = styled.div`
+    font-family: PTSerif;
+    font-size: 20px;
+    font-weight: bold;
+    color: #000000;
+`
+
+const Description = styled.div`
+    font-family: Roboto;
+    font-size: 15px;
+    color: #646464;
+    line-height: 22px;
+`
+
+const SidebarPage = styled.div`
+    width: 100%;
+    height: 100%;
+`
+
+interface SidebarProps {
+    show: boolean
+    propertyId?: string
+    ownerId?: string
+}
+
+interface SidebarContainerProps {
+    show: boolean
+}
+
+interface PersonListProps {
+    persons: Person[]
+}
+
+const PersonList: FC<PersonListProps> = ({ persons }) => {
+    return (
+        <>
+
+        </>
+    )
+}
+
 const Sidebar: FC<SidebarProps> = ({ show, propertyId, ownerId }) => {
+    const sidebarContainerRef = useRef<HTMLDivElement>(null)
     // const [{ data, loading, error }] = useAxios<Property>(
     //     `https://branched-glue.glitch.me/object/objects/${propertyId}`
     // )
@@ -408,30 +452,46 @@ const Sidebar: FC<SidebarProps> = ({ show, propertyId, ownerId }) => {
         `https://branched-glue.glitch.me/object/objects?personId=${ownerId}`
     )
 
+    useEffect(() => {
+        if (sidebarContainerRef.current) {
+            sidebarContainerRef.current.scrollTo({
+                top: 0,
+                left: 0,
+                behavior: 'smooth'
+            })
+        }
+    }, [propertyId])
+
     console.log(propertiesData)
 
     const property = propertiesData && propertiesData.count > 0 && propertiesData.items.find(p => p._id === propertyId)
 
     return (
-        <SidebarContainer show={show}>
-            <SearchBar />
-            {property && <PropertyInfo property={property} />}
-            {person && <PersonInfo person={person} />}
-            <Block>
-                <Line />
-            </Block>
-            <Block>
-                <SidebarTitle>
-                    Другое имущество чиновника
-                </SidebarTitle>
-            </Block>
-            <Block>
-                <InfoBlock>
-                    <InfoLabel>Общая стоимость</InfoLabel>
-                    <InfoData>2 980 200 000 руб</InfoData>
-                </InfoBlock>
-            </Block>
-            {propertiesData && propertiesData.items && <OtherProperties properties={propertiesData.items} propertyId={propertyId} />}
+        <SidebarContainer ref={sidebarContainerRef} show={show}>
+            {!!ownerId ?
+                <SidebarPage>
+                    {/* <SearchBar /> */}
+                    <Block></Block>
+                    {property && <PropertyInfo property={property} />}
+                    {person && <PersonInfo person={person} />}
+                    <Block>
+                        <Line />
+                    </Block>
+                    {propertiesData && propertiesData.items && <OtherProperties properties={propertiesData.items} propertyId={propertyId} />}
+                </SidebarPage>
+                :
+                <SidebarPage>
+                    <Block></Block>
+                    <Block>
+                        <Title>Карта коррупционных расследований</Title>
+                        <Description>
+                        </Description>
+                    </Block>
+                    <Block>
+                        <Line />
+                    </Block>
+                </SidebarPage>
+            }
         </SidebarContainer>
     )
 }

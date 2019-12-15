@@ -39,7 +39,7 @@ function appReducer(state: AppState, action: AppActions): AppState {
 
 const initialState = {
   sidebar: true,
-  propertyId: '5df642455341ca2822139b31',
+  propertyId: '5df642bf1c9d44000093bd99',
   ownerId: '5df642455341ca2822139b33'
 }
 

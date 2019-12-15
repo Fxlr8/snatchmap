@@ -9,7 +9,7 @@ export interface Property {
     locationUrl: string
     location: any
     text: string
-    fbkUrl: string
+    proofUrl: string
     personId: string
     photoUrl: string
     type: 'building' | 'yacht' | 'plane'
@@ -24,4 +24,5 @@ export interface Person {
     workFrom: string
     surname: string
     views: number
+    photoUrl: string
 }
