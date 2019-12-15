@@ -7,7 +7,7 @@ import planeSvg from '../svg/plane.svg'
 import buildingSvg from '../svg/building.svg'
 import device from '../breakpoints'
 import useAxios from 'axios-hooks'
-import { Property } from '../apiTypes'
+import { Property, Person } from '../apiTypes'
 
 const SidebarContainer = styled.div<SidebarContainerProps>`
     width: 100vw;
@@ -233,28 +233,25 @@ const OtherPropertyPrice = styled.div`
 interface SidebarProps {
     show: boolean
     propertyId?: string
+    ownerId?: string
 }
 
 interface SidebarContainerProps {
     show: boolean
 }
 
-interface ApiResponse {
+interface ApiPropertiesResponse {
     count: number
     items: Property[]
 }
 
-const Sidebar: FC<SidebarProps> = ({ show, propertyId }) => {
-    const [{ data, loading, error }] = useAxios<Property>(
-        `https://branched-glue.glitch.me/object/objects/${propertyId}`
-    )
+interface PropertyInfoProps {
+    property: Property
+}
 
-    const property = data || {}
-    console.log(property)
-
+const PropertyInfo: FC<PropertyInfoProps> = ({ property }) => {
     return (
-        <SidebarContainer show={show}>
-            <SearchBar />
+        <>
             <Block>
                 <SidebarTitle>
                     Объект
@@ -266,7 +263,7 @@ const Sidebar: FC<SidebarProps> = ({ show, propertyId }) => {
                     <PropertyName>{property.name}</PropertyName>
                     <PropertyFeature>2112м<sup>2</sup></PropertyFeature>
                 </Flex>
-                <PropertyDescription>Усачёва ул., 1А, стр. 2</PropertyDescription>
+                <PropertyDescription>{property.text}</PropertyDescription>
             </Block>
             <Block>
                 <Flex>
@@ -274,12 +271,23 @@ const Sidebar: FC<SidebarProps> = ({ show, propertyId }) => {
                 </Flex>
             </Block>
             <Block>
-                <Link href={property.link}>
+                <Link href={property.fbkUrl}>
                     <LogoFBK />
                     <LinkTitle>Ссылка на расследование ФБК</LinkTitle>
                     <GreyIcon src={linkSvg} />
                 </Link>
             </Block>
+        </>
+    )
+}
+
+interface PersonInfoProps {
+    person: Person
+}
+
+const PersonInfo: FC<PersonInfoProps> = ({ person }) => {
+    return (
+        <>
             <Block>
                 <SidebarTitle>
                     Владелец
@@ -289,18 +297,18 @@ const Sidebar: FC<SidebarProps> = ({ show, propertyId }) => {
                 <PersonBlock>
                     <PersonImage style={{ backgroundImage: 'url(http://duma.gov.ru/media/persons/240x240_2x/bBET61AcAEG5c8Nk7jlFAW1XRFQCAc8l.jpg)' }} />
                     <div>
-                        <PersonSurname>Пупа</PersonSurname>
-                        <PersonName>Виталий Сергеевич</PersonName>
+                        <PersonSurname>{person.surname}</PersonSurname>
+                        <PersonName>{person.name}</PersonName>
                     </div>
                 </PersonBlock>
             </Block>
             <PersonDescription>
-                Заведующий по перепутыванию при бухгалтерии Государственной Думы Российской Федерации
+                {person.description}
             </PersonDescription>
             <Block>
                 <InfoBlock>
                     <InfoLabel>Партия</InfoLabel>
-                    <InfoData>Единая Россия</InfoData>
+                    <InfoData>{person.party}</InfoData>
                 </InfoBlock>
                 <InfoBlock>
                     <InfoLabel>Стаж на посту</InfoLabel>
@@ -308,13 +316,52 @@ const Sidebar: FC<SidebarProps> = ({ show, propertyId }) => {
                 </InfoBlock>
                 <InfoBlock>
                     <InfoLabel>Официальный оклад</InfoLabel>
-                    <InfoData>455 000 руб.</InfoData>
+                    <InfoData>{person.salary} руб.</InfoData>
                 </InfoBlock>
                 <InfoBlock>
                     <InfoLabel>Время для накопления стоимости объекта</InfoLabel>
                     <InfoData>90 лет</InfoData>
                 </InfoBlock>
             </Block>
+        </>
+    )
+}
+
+const OtherProperty: FC<PropertyInfoProps> = ({ property }) => {
+    return (
+        <Block>
+            <OtherPropertyImage src='https://placekitten.com/500/300' />
+            <Flex>
+                <PropertyName>{property.name}</PropertyName>
+                <PropertyFeature>1920м<sup>2</sup></PropertyFeature>
+            </Flex>
+            <OtherPropertyPrice>{property.price} руб</OtherPropertyPrice>
+        </Block>
+    )
+}
+
+const Sidebar: FC<SidebarProps> = ({ show, propertyId, ownerId }) => {
+    // const [{ data, loading, error }] = useAxios<Property>(
+    //     `https://branched-glue.glitch.me/object/objects/${propertyId}`
+    // )
+
+    const [{ data: person }] = useAxios(
+        `https://branched-glue.glitch.me/object/persons/${ownerId}`
+    )
+
+    const [{ data: propertiesData }] = useAxios<ApiPropertiesResponse>(
+        `https://branched-glue.glitch.me/object/objects?personId=${ownerId}`
+    )
+
+    console.log(propertiesData)
+
+    const property = propertiesData && propertiesData.count > 0 && propertiesData.items.find(p => p._id === propertyId)
+
+    return (
+        <SidebarContainer show={show}>
+            <SearchBar />
+            {property && <PropertyInfo property={property} />}
+            {person && <PersonInfo person={person} />}
             <Block>
                 <Line />
             </Block>
@@ -351,14 +398,7 @@ const Sidebar: FC<SidebarProps> = ({ show, propertyId }) => {
                     </PropertyType>
                 </PropertyTypes>
             </Block>
-            <Block>
-                <OtherPropertyImage src='https://i.imgur.com/A0sTAOh.jpg' />
-                <Flex>
-                    <PropertyName>Дом в Майнкрафте</PropertyName>
-                    <PropertyFeature>1920м<sup>2</sup></PropertyFeature>
-                </Flex>
-                <OtherPropertyPrice>120 руб</OtherPropertyPrice>
-            </Block>
+            {propertiesData && propertiesData.count > 0 && propertiesData.items.filter(p => p._id !== propertyId).map(otherProperty => <OtherProperty property={otherProperty} />)}
             <Block>
                 <OtherPropertyImage src='https://i.imgur.com/Wf8wsxR.png' />
                 <Flex>
