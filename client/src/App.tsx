@@ -14,7 +14,8 @@ interface ToggleSidebarAction {
 
 interface SetPropertyAction {
   type: typeof SELECT_PROPERTY
-  payload: number
+  propertyId: string,
+  ownerId: string
 }
 
 type AppActions = ToggleSidebarAction | SetPropertyAction
@@ -22,11 +23,16 @@ type AppActions = ToggleSidebarAction | SetPropertyAction
 interface AppState {
   sidebar: boolean
   propertyId?: string
+  ownerId?: string
 }
 
 function appReducer(state: AppState, action: AppActions): AppState {
   switch (action.type) {
-
+    case SELECT_PROPERTY: return {
+      ...state,
+      propertyId: action.propertyId,
+      ownerId: action.ownerId
+    }
   }
   return state
 }
