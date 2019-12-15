@@ -1,11 +1,12 @@
 import styled from 'styled-components'
 import React, { FC } from 'react'
-import ReactMapboxGl, { Layer, Feature } from 'react-mapbox-gl'
+import ReactMapboxGl, { Marker } from 'react-mapbox-gl'
 import useAxios from 'axios-hooks'
 
-// import plane from 'svg/plane.svg'
-// import ship from 'svg/ship.svg'
+import plane from 'svg/map/plane.svg'
+import ship from 'svg/map/ship.svg'
 import pin from 'svg/map/pin.svg'
+
 import { Property } from 'apiTypes'
 
 const MapComponent = ReactMapboxGl({
@@ -16,36 +17,53 @@ interface MapProps {
     className?: string
 }
 
-const layoutLayer = { 'icon-image': 'pin' }
+const Layers: React.FC<{ data: { items: Property[] } }> = ({ data }) => {
+    const pins = data.items.filter((item: Property) => item.type === 'building')
+    const ships = data.items.filter((item: Property) => item.type === 'yacht')
+    const planes = data.items.filter((item: Property) => item.type === 'plane')
 
-const image = new Image()
-image.src = pin
-const images: any = ['pin', image]
+    console.log(pins, ships, planes)
+
+    return (
+        <>
+            {pins.map((item: Property) => {
+                return (
+                    <Marker key={item._id} coordinates={item.location.geometry.coordinates}>
+                        <img src={pin} alt={'plane'} />
+                    </Marker>
+                )
+            })}
+            {planes.map((item: Property) => {
+                return (
+                    <Marker key={item._id} coordinates={item.location.geometry.coordinates}>
+                        <img src={plane} alt={'plane'} />
+                    </Marker>
+                )
+            })}
+            {ships.map((item: Property) => {
+                return (
+                    <Marker key={item._id} coordinates={item.location.geometry.coordinates}>
+                        <img src={ship} alt={'plane'} />
+                    </Marker>
+                )
+            })}
+        </>
+    )
+}
 
 const Map: FC<MapProps> = ({ className }) => {
     const [{ data, loading, error }] = useAxios(
         'https://branched-glue.glitch.me/object/objects?fields=link,name,text,personInfo,locationUrl,location,type'
     )
 
-    console.log(data)
-
     return (
         <MapComponent
             style="mapbox://styles/mapbox/light-v10" //eslint-disable-line
             center={[37.627771, 55.7537485]}
+            zoom={[2]}
             className={className}
         >
-            <>
-                {!loading && !error ? (
-                    <Layer type="symbol" id="marker" layout={layoutLayer} images={images}>
-                        {data.items.map((item: Property) => {
-                            const [lat, lng] = item.location.geometry.coordinates
-                            const coordinates = [lat, lng]
-                            return <Feature key={item._id} coordinates={coordinates} />
-                        })}
-                    </Layer>
-                ) : null}
-            </>
+            <>{!loading && !error ? <Layers data={data} /> : null}</>
         </MapComponent>
     )
 }
