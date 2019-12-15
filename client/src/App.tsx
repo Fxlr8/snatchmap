@@ -5,7 +5,7 @@ import Logo from 'components/Logo'
 import Search from 'components/Search'
 
 const TOGGLE_SIDEBAR = 'TOGGLE_SIDEBAR'
-const SET_PROPERTY = 'SET_PROPERTY'
+const SELECT_PROPERTY = 'SELECT_PROPERTY'
 
 interface ToggleSidebarAction {
   type: typeof TOGGLE_SIDEBAR
@@ -13,7 +13,7 @@ interface ToggleSidebarAction {
 }
 
 interface SetPropertyAction {
-  type: typeof SET_PROPERTY
+  type: typeof SELECT_PROPERTY
   payload: number
 }
 
@@ -21,7 +21,7 @@ type AppActions = ToggleSidebarAction | SetPropertyAction
 
 interface AppState {
   sidebar: boolean
-  propertyId?: number
+  propertyId?: string
 }
 
 function appReducer(state: AppState, action: AppActions): AppState {
@@ -33,7 +33,8 @@ function appReducer(state: AppState, action: AppActions): AppState {
 
 const App: React.FC = () => {
   const [state, dispatch] = useReducer(appReducer, {
-    sidebar: true
+    sidebar: true,
+    propertyId: '5df60885ad40cc14a218290d'
   })
 
   return (
