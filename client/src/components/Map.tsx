@@ -5,7 +5,7 @@ import useAxios from 'axios-hooks'
 
 // import plane from 'svg/plane.svg'
 // import ship from 'svg/ship.svg'
-import pin from 'svg/pin.svg'
+import pin from 'svg/map/pin.svg'
 import { Property } from 'apiTypes'
 
 const MapComponent = ReactMapboxGl({
