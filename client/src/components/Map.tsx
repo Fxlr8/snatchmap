@@ -1,7 +1,8 @@
 import styled from 'styled-components'
-import React, { FC } from 'react'
+import React, { FC, useContext } from 'react'
 import ReactMapboxGl, { Marker } from 'react-mapbox-gl'
 import useAxios from 'axios-hooks'
+import { StateContext } from '../App'
 
 import plane from 'svg/map/plane.svg'
 import ship from 'svg/map/ship.svg'
@@ -17,32 +18,41 @@ interface MapProps {
     className?: string
 }
 
-const Layers: React.FC<{ data: { items: Property[] } }> = ({ data }) => {
-    const pins = data.items.filter((item: Property) => item.type === 'building')
-    const ships = data.items.filter((item: Property) => item.type === 'yacht')
-    const planes = data.items.filter((item: Property) => item.type === 'plane')
+function swap(coord: [number, number]): [number, number] {
+    return [coord[1], coord[0]]
+}
 
-    console.log(pins, ships, planes)
+const Layers: React.FC<{ data: { items: Property[] } }> = ({ data }) => {
+    const { dispatch } = useContext(StateContext)
+    const pins = data.items.filter((item) => item.type === 'building')
+    const ships = data.items.filter((item) => item.type === 'yacht')
+    const planes = data.items.filter((item) => item.type === 'plane')
 
     return (
         <>
             {pins.map((item: Property) => {
                 return (
-                    <Marker key={item._id} coordinates={item.location.geometry.coordinates}>
+                    <Marker key={item._id}
+                        onClick={() => dispatch({ type: 'SELECT_PROPERTY', propertyId: item._id, ownerId: item.personId })}
+                        coordinates={swap(item.location.geometry.coordinates)}>
                         <img src={pin} alt={'plane'} />
                     </Marker>
                 )
             })}
             {planes.map((item: Property) => {
                 return (
-                    <Marker key={item._id} coordinates={item.location.geometry.coordinates}>
+                    <Marker key={item._id}
+                        onClick={() => dispatch({ type: 'SELECT_PROPERTY', propertyId: item._id, ownerId: item.personId })}
+                        coordinates={swap(item.location.geometry.coordinates)}>
                         <img src={plane} alt={'plane'} />
                     </Marker>
                 )
             })}
             {ships.map((item: Property) => {
                 return (
-                    <Marker key={item._id} coordinates={item.location.geometry.coordinates}>
+                    <Marker key={item._id}
+                        onClick={() => dispatch({ type: 'SELECT_PROPERTY', propertyId: item._id, ownerId: item.personId })}
+                        coordinates={swap(item.location.geometry.coordinates)}>
                         <img src={ship} alt={'plane'} />
                     </Marker>
                 )
@@ -53,7 +63,7 @@ const Layers: React.FC<{ data: { items: Property[] } }> = ({ data }) => {
 
 const Map: FC<MapProps> = ({ className }) => {
     const [{ data, loading, error }] = useAxios(
-        'https://branched-glue.glitch.me/object/objects?fields=link,name,text,personInfo,locationUrl,location,type'
+        'https://branched-glue.glitch.me/object/objects'
     )
 
     return (
