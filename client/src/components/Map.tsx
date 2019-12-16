@@ -10,10 +10,8 @@ import pin from '../svg/map/pin.svg'
 import { Property } from 'apiTypes'
 
 function createImage(src: string) {
-    const image = new Image()
+    const image = new Image(75, 75)
     image.src = src
-    image.width *= 2
-    image.height *= 2
     return image
 }
 
@@ -58,6 +56,16 @@ const PinLayer: React.FC<PinLayerProps> = ({ imageName, objects }) => {
 
 const defaultCenter: [number, number] = [37.627771, 55.7537485]
 
+const Images: FC = memo(() => {
+    return (
+        <>
+            <MapImage id='plane-icon' data={planeImage} />
+            <MapImage id='ship-icon' data={shipImage} />
+            <MapImage id='pin-icon' data={pinImage} />
+        </>
+    )
+})
+
 const Map: FC<MapProps> = ({ className }) => {
     const { state: { propertyId } } = useContext(StateContext)
     const [{ data, loading, error }] = useAxios<MapApiResult>(
@@ -85,13 +93,10 @@ const Map: FC<MapProps> = ({ className }) => {
             className={className}
             movingMethod='easeTo'
         >
-
-            <MapImage id='plane-icon' data={planeImage} />
-            <MapImage id='ship-icon' data={shipImage} />
-            <MapImage id='pin-icon' data={pinImage} />
             {pins && <PinLayer objects={pins} imageName='pin-icon' />}
             {ships && <PinLayer objects={ships} imageName='ship-icon' />}
             {planes && <PinLayer objects={planes} imageName='plane-icon' />}
+            <Images />
             {/* <>{!loading && !error ? <Layers data={data} /> : null}</> */}
         </MapComponent>
     )
