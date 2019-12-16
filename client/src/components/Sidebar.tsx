@@ -1,32 +1,57 @@
-import React, { FC, useContext, useRef, useEffect } from 'react'
+import React, { FC, useContext, useRef, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import SVG from './Icon'
 import linkSvg from '../svg/link.svg'
 import shipSvg from '../svg/ship.svg'
 import planeSvg from '../svg/plane.svg'
+import crossSvg from '../svg/cross.svg'
+import githubSvg from '../svg/github.svg'
 import buildingSvg from '../svg/building.svg'
 import device from '../breakpoints'
+import _Div100vh from 'react-div-100vh'
 import useAxios from 'axios-hooks'
 import { Property, Person } from '../apiTypes'
 import { StateContext } from '../App'
 import { FormattedNumber, FormattedDate } from 'react-intl'
+import SwipeableViews from 'react-swipeable-views'
+
+const Div100vh = styled(_Div100vh)`
+    position: fixed;
+    left: 0;
+    top: 0;
+`
+
+const CloseButton = styled.div`
+    position: absolute;
+    background: #FFFFFF;
+    box-shadow: 0 2px 6px 0 rgba(0,0,0,0.20);
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: -12px;
+    right: 24px;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+`
 
 const SidebarContainer = styled.div<SidebarContainerProps>`
     width: 100vw;
-    height: 70vh;
-    top: 30vh;
+    height: 60%;
+    top: 40%;
     background-color: #FFF;
-    position: fixed;
     left: 0;
     z-index: 10;
     overflow-y: scroll;
+    position: relative;
 
     transform: translateX(${props => props.show ? 0 : -100}%);
     transition: transform 200ms ease;
 
     @media ${device.laptop} {
         width: 420px;
-        height: 100vh;
+        height: 100%;
         top: 0;
         transform: translateX(${props => props.show ? 0 : -100}%);
         transform: translateY(${props => props.show ? 0 : 100}%);
@@ -368,7 +393,7 @@ const OtherProperties: FC<OtherPropertiesProps> = ({ properties, propertyId }) =
     return (
         <>
             <Block>
-                <SidebarTitle>Имущество чиновника</SidebarTitle>
+                <SidebarTitle>Имущество</SidebarTitle>
             </Block>
             <Block>
                 <InfoBlock>
@@ -410,7 +435,6 @@ const Title = styled.div`
     font-size: 20px;
     font-weight: bold;
     color: #000000;
-    padding-top: 24px;
 `
 
 const Description = styled.div`
@@ -421,8 +445,10 @@ const Description = styled.div`
 `
 
 const SidebarPage = styled.div`
+    padding-top: 24px;
     width: 100%;
     height: 100%;
+    box-sizing: border-box;
 `
 
 interface SidebarProps {
@@ -451,7 +477,7 @@ const PersonList: FC = () => {
         <>
             {persons.map(person =>
                 <Block>
-                    <PersonBlock onClick={() => { dispatch({ type: 'SELECT_PROPERTY', ownerId: person._id }) }}>
+                    <PersonBlock style={{ cursor: 'pointer' }} onClick={() => { dispatch({ type: 'SELECT_PROPERTY', ownerId: person._id }) }}>
                         <PersonImage style={{ backgroundImage: `url(${person.photoUrl})` }} />
                         <div>
                             <PersonSurname>{person.surname}</PersonSurname>
@@ -464,8 +490,17 @@ const PersonList: FC = () => {
     )
 }
 
+const QuoteName = styled.div`
+    font-weight: bold;
+    margin-top: 10px;
+    text-align: right;
+    font-family: PTSerif;
+`
+
 const Sidebar: FC<SidebarProps> = ({ show, propertyId, ownerId }) => {
     const sidebarContainerRef = useRef<HTMLDivElement>(null)
+    const { dispatch } = useContext(StateContext)
+    const [index, setIndex] = useState(0)
     // const [{ data, loading, error }] = useAxios<Property>(
     //     `https://branched-glue.glitch.me/object/objects/${propertyId}`
     // )
@@ -486,42 +521,72 @@ const Sidebar: FC<SidebarProps> = ({ show, propertyId, ownerId }) => {
                 behavior: 'smooth'
             })
         }
-    }, [propertyId])
+    }, [propertyId, ownerId])
+
+    useEffect(() => {
+        if (propertyId || ownerId) {
+            setIndex(1)
+        } else {
+            setIndex(0)
+        }
+    }, [propertyId, ownerId])
 
     console.log(propertiesData)
 
     const property = propertiesData && propertiesData.count > 0 && propertiesData.items.find(p => p._id === propertyId)
 
     return (
-        <SidebarContainer ref={sidebarContainerRef} show={show}>
-            {!!ownerId ?
-                <SidebarPage>
-                    {/* <SearchBar /> */}
-                    <Block></Block>
-                    {property && <PropertyInfo property={property} />}
-                    {person && <PersonInfo person={person} />}
-                    <Block>
-                        <Line />
-                    </Block>
-                    {propertiesData && propertiesData.items && <OtherProperties properties={propertiesData.items} propertyId={propertyId} />}
-                </SidebarPage>
-                :
-                <SidebarPage>
-                    <Block>
-                        <Title>Карта антикоррупционных расследований</Title>
-                        <Description>
-                        </Description>
-                    </Block>
-                    <Block>
-                        <Line />
-                    </Block>
-                    <Block>
-                        <SidebarTitle>Действующие лица</SidebarTitle>
-                    </Block>
-                    <PersonList />
-                </SidebarPage>
-            }
-        </SidebarContainer>
+        <Div100vh>
+            <SidebarContainer ref={sidebarContainerRef} show={show}>
+                <SwipeableViews index={index} onChangeIndex={(i) => setIndex(i)} >
+                    <SidebarPage>
+                        <Block>
+                            <Title>Карта антикоррупционных расследований</Title>
+                            <Description>
+                                Жулики и воры очень не любят публичность и лишнее внимание.
+                                Цель проекта - собрать на одной карте как можно больше фактов коррупции и сделать достоянием общественности.
+                            </Description>
+                        </Block>
+                        <PersonDescription>
+                            «Нет никаких «государственных денег», есть только деньги налогоплательщиков.»
+                                <QuoteName>М. Тэтчер</QuoteName>
+                        </PersonDescription>
+                        <Block>
+                            <Description>
+                                Все данные взяты из открытых источников.
+                                <br />
+                                Данные хранятся в публичном репозитории:
+                            </Description>
+                        </Block>
+                        <Block>
+                            <Link target='_blank' href='https://github.com/awesome-corruption/main'>
+                                <SVG src={githubSvg} />
+                                <LinkTitle>Помочь заполнить базу</LinkTitle>
+                                <GreyIcon src={linkSvg} />
+                            </Link>
+                        </Block>
+
+                        <Block>
+                            <SidebarTitle>Действующие лица</SidebarTitle>
+                        </Block>
+                        <PersonList />
+                    </SidebarPage>
+                    <SidebarPage>
+                        <div style={{ position: 'relative' }}>
+                            <CloseButton onClick={() => dispatch({ type: 'SELECT_PROPERTY' })}>
+                                <SVG src={crossSvg} />
+                            </CloseButton>
+                        </div>
+                        {property && <PropertyInfo property={property} />}
+                        {person && <PersonInfo person={person} />}
+                        <Block>
+                            <Line />
+                        </Block>
+                        {propertiesData && propertiesData.items && <OtherProperties properties={propertiesData.items} propertyId={propertyId} />}
+                    </SidebarPage>
+                </SwipeableViews>
+            </SidebarContainer>
+        </Div100vh>
     )
 }
 

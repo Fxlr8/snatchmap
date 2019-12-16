@@ -7,6 +7,8 @@ import Icon from '../components/Icon'
 import plane from '../svg/map/plane.svg'
 import ship from '../svg/map/ship.svg'
 import pin from '../svg/map/pin.svg'
+import device from '../breakpoints'
+import Div100vh from 'react-div-100vh'
 import { Property } from 'apiTypes'
 
 function createImage(src: string) {
@@ -22,6 +24,17 @@ const pinImage = createImage(pin)
 const MapComponent = ReactMapboxGl({
     accessToken: 'pk.eyJ1IjoiZnhscjgiLCJhIjoiY2s0NGpieWpkMGJ6eDNvbWdvcml1aG1pZSJ9.pAeNPdFX91L9Z33XLXrnbA',
 })
+
+const StyledMap = styled(MapComponent)`
+    height: 100%;
+    width: 100%;
+    transform: translateY(-30%);
+    transition: transform 300ms ease;
+
+    @media ${device.laptop} {
+        transform: translateY(0);
+    }
+`
 
 interface MapProps {
     className?: string
@@ -66,6 +79,8 @@ const Images: FC = memo(() => {
     )
 })
 
+const initialZoom: [number] = [3]
+
 const Map: FC<MapProps> = ({ className }) => {
     const { state: { propertyId } } = useContext(StateContext)
     const [{ data, loading, error }] = useAxios<MapApiResult>(
@@ -87,18 +102,21 @@ const Map: FC<MapProps> = ({ className }) => {
     }, [propertyId, data])
 
     return (
-        <MapComponent
-            style="mapbox://styles/mapbox/light-v10" //eslint-disable-line
-            center={center}
-            className={className}
-            movingMethod='easeTo'
-        >
-            {pins && <PinLayer objects={pins} imageName='pin-icon' />}
-            {ships && <PinLayer objects={ships} imageName='ship-icon' />}
-            {planes && <PinLayer objects={planes} imageName='plane-icon' />}
-            <Images />
-            {/* <>{!loading && !error ? <Layers data={data} /> : null}</> */}
-        </MapComponent>
+        <Div100vh>
+            <StyledMap
+                style="mapbox://styles/mapbox/light-v10" //eslint-disable-line
+                center={center}
+                className={className}
+                zoom={initialZoom}
+                movingMethod='easeTo'
+            >
+                {pins && <PinLayer objects={pins} imageName='pin-icon' />}
+                {ships && <PinLayer objects={ships} imageName='ship-icon' />}
+                {planes && <PinLayer objects={planes} imageName='plane-icon' />}
+                <Images />
+                {/* <>{!loading && !error ? <Layers data={data} /> : null}</> */}
+            </StyledMap>
+        </Div100vh>
     )
 }
 
