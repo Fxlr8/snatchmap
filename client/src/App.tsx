@@ -14,8 +14,8 @@ interface ToggleSidebarAction {
 
 interface SetPropertyAction {
   type: typeof SELECT_PROPERTY
-  propertyId: string,
-  ownerId: string
+  propertyId?: string,
+  ownerId?: string
 }
 
 type AppActions = ToggleSidebarAction | SetPropertyAction
@@ -39,8 +39,8 @@ function appReducer(state: AppState, action: AppActions): AppState {
 
 const initialState = {
   sidebar: true,
-  propertyId: '5df642bf1c9d44000093bd99',
-  ownerId: '5df642455341ca2822139b33'
+  // propertyId: '5df642bf1c9d44000093bd99',
+  // ownerId: '5df642455341ca2822139b33'
 }
 
 const StateContext = createContext<{ state: AppState, dispatch: React.Dispatch<AppActions> }>(

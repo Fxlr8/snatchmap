@@ -9,7 +9,7 @@ import device from '../breakpoints'
 import useAxios from 'axios-hooks'
 import { Property, Person } from '../apiTypes'
 import { StateContext } from '../App'
-import { FormattedNumber, FormattedDate, FormattedRelativeTime } from 'react-intl'
+import { FormattedNumber, FormattedDate } from 'react-intl'
 
 const SidebarContainer = styled.div<SidebarContainerProps>`
     width: 100vw;
@@ -82,6 +82,7 @@ const PropertyName = styled.div`
 const PropertyFeature = styled.div`
     color: #646464;
     font-size: 16px;
+    margin-left: 24px;
 `
 
 const PropertyDescription = styled.div`
@@ -257,7 +258,7 @@ const PropertyInfo: FC<PropertyInfoProps> = ({ property }) => {
             <Block>
                 <Flex>
                     <PropertyName>{property.name}</PropertyName>
-                    <PropertyFeature>2112м<sup>2</sup></PropertyFeature>
+                    {/* <PropertyFeature>2112м<sup>2</sup></PropertyFeature> */}
                 </Flex>
                 <PropertyDescription>{property.text}</PropertyDescription>
             </Block>
@@ -302,22 +303,22 @@ const PersonInfo: FC<PersonInfoProps> = ({ person }) => {
                 {person.description}
             </PersonDescription>
             <Block>
-                <InfoBlock>
+                {!!person.party && <InfoBlock>
                     <InfoLabel>Партия</InfoLabel>
                     <InfoData>{person.party}</InfoData>
-                </InfoBlock>
-                <InfoBlock>
+                </InfoBlock>}
+                {/* <InfoBlock>
                     <InfoLabel>Стаж на посту</InfoLabel>
                     <InfoData><FormattedDate value={person.workFrom} /></InfoData>
-                </InfoBlock>
+                </InfoBlock> */}
                 {!!person.salary && <InfoBlock>
                     <InfoLabel>Официальный оклад</InfoLabel>
                     <InfoData><FormattedNumber value={person.salary} /> руб.</InfoData>
                 </InfoBlock>}
-                <InfoBlock>
+                {/* <InfoBlock>
                     <InfoLabel>Время для накопления стоимости объекта</InfoLabel>
                     <InfoData>90 лет</InfoData>
-                </InfoBlock>
+                </InfoBlock> */}
             </Block>
         </>
     )
@@ -330,7 +331,7 @@ const OtherProperty: FC<PropertyInfoProps> = ({ property }) => {
             <OtherPropertyImage src={property.photoUrl} />
             <Flex>
                 <PropertyName>{property.name}</PropertyName>
-                <PropertyFeature>1920м<sup>2</sup></PropertyFeature>
+                {/* <PropertyFeature>1920м<sup>2</sup></PropertyFeature> */}
             </Flex>
             <OtherPropertyPrice><FormattedNumber value={property.price} /> руб</OtherPropertyPrice>
         </ClickableBlock>
@@ -344,7 +345,8 @@ interface OtherPropertiesProps {
 
 const OtherProperties: FC<OtherPropertiesProps> = ({ properties, propertyId }) => {
     let total = 0
-    const [houses, ships, planes] = properties.reduce(([s, h, p], { type, price }) => {
+    console.log(properties)
+    const [houses, ships, planes] = properties.reduce(([h, s, p], { type, price }) => {
         total += price
         switch (type) {
             case 'yacht': s += 1
@@ -354,13 +356,19 @@ const OtherProperties: FC<OtherPropertiesProps> = ({ properties, propertyId }) =
             case 'plane': p += 1
                 break
         }
-        return [s, h, p]
+        return [h, s, p]
     }, [0, 0, 0])
+
+    console.log({
+        houses,
+        ships,
+        planes
+    })
 
     return (
         <>
             <Block>
-                <SidebarTitle>Другое имущество чиновника</SidebarTitle>
+                <SidebarTitle>Имущество чиновника</SidebarTitle>
             </Block>
             <Block>
                 <InfoBlock>
@@ -402,6 +410,7 @@ const Title = styled.div`
     font-size: 20px;
     font-weight: bold;
     color: #000000;
+    padding-top: 24px;
 `
 
 const Description = styled.div`
@@ -426,14 +435,31 @@ interface SidebarContainerProps {
     show: boolean
 }
 
-interface PersonListProps {
-    persons: Person[]
+interface PersonsResponse {
+    items: Person[]
 }
 
-const PersonList: FC<PersonListProps> = ({ persons }) => {
+const PersonList: FC = () => {
+    const { dispatch } = useContext(StateContext)
+    const [{ data }] = useAxios<PersonsResponse>(
+        `https://branched-glue.glitch.me/object/persons/`
+    )
+
+    const persons = data && data.items || []
+
     return (
         <>
-
+            {persons.map(person =>
+                <Block>
+                    <PersonBlock onClick={() => { dispatch({ type: 'SELECT_PROPERTY', ownerId: person._id }) }}>
+                        <PersonImage style={{ backgroundImage: `url(${person.photoUrl})` }} />
+                        <div>
+                            <PersonSurname>{person.surname}</PersonSurname>
+                            <PersonName>{person.name}</PersonName>
+                        </div>
+                    </PersonBlock>
+                </Block>
+            )}
         </>
     )
 }
@@ -481,15 +507,18 @@ const Sidebar: FC<SidebarProps> = ({ show, propertyId, ownerId }) => {
                 </SidebarPage>
                 :
                 <SidebarPage>
-                    <Block></Block>
                     <Block>
-                        <Title>Карта коррупционных расследований</Title>
+                        <Title>Карта антикоррупционных расследований</Title>
                         <Description>
                         </Description>
                     </Block>
                     <Block>
                         <Line />
                     </Block>
+                    <Block>
+                        <SidebarTitle>Действующие лица</SidebarTitle>
+                    </Block>
+                    <PersonList />
                 </SidebarPage>
             }
         </SidebarContainer>
