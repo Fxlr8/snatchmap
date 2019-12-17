@@ -19,6 +19,7 @@ const Div100vh = styled(_Div100vh)`
     position: fixed;
     left: 0;
     top: 0;
+    pointer-events: none;
 `
 
 const CloseButton = styled.div`
@@ -45,6 +46,7 @@ const SidebarContainer = styled.div<SidebarContainerProps>`
     z-index: 10;
     overflow-y: scroll;
     position: relative;
+    pointer-events: auto;
 
     transform: translateX(${props => props.show ? 0 : -100}%);
     transition: transform 200ms ease;
